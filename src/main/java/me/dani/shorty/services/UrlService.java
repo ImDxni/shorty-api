@@ -2,6 +2,7 @@ package me.dani.shorty.services;
 
 import lombok.RequiredArgsConstructor;
 import me.dani.shorty.entities.URLEntity;
+import me.dani.shorty.entities.UserEntity;
 import me.dani.shorty.repositories.UrlRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class UrlService {
 
     private final UrlRepository repository;
 
-    public String generateShortUrl(String originalUrl){
+    public String generateShortUrl(String originalUrl, UserEntity user){
         if(!validateURL(originalUrl)){
             throw new IllegalArgumentException("Invalid URL");
         }
@@ -33,6 +34,7 @@ public class UrlService {
         entity.setOriginalUrl(originalUrl);
         entity.setCode(code);
         entity.setExpiresAt(LocalDateTime.now().plusDays(30));
+        entity.setUser(user);
 
         repository.save(entity);
 

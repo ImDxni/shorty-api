@@ -23,9 +23,16 @@ public class URLEntity {
     @Column(nullable = false, unique = true)
     private String code;
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     @Column(nullable = false)
     private LocalDateTime expiresAt;
+
+
 }

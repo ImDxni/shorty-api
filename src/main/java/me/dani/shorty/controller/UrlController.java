@@ -1,9 +1,12 @@
 package me.dani.shorty.controller;
 
 import lombok.RequiredArgsConstructor;
+import me.dani.shorty.entities.UserEntity;
+import me.dani.shorty.repositories.UserRepository;
 import me.dani.shorty.services.UrlService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -12,6 +15,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class UrlController {
     private final UrlService urlService;
+    private final UserRepository userRepository;
 
     public record UrlRequest(String originalUrl) {}
     public record UrlResponse(String shortUrl) {}
@@ -19,9 +23,13 @@ public class UrlController {
     @PostMapping("/shorten")
     public ResponseEntity<UrlResponse> shortenLink(@RequestBody UrlRequest request){
 
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        UserEntity user = userRepository.findById(username).orElseThrow(() -> new RuntimeException("User not found"));
+
         String shortCode;
         try {
-            shortCode = urlService.generateShortUrl(request.originalUrl());
+            shortCode = urlService.generateShortUrl(request.originalUrl(),user);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
